@@ -11,7 +11,7 @@
 
 ### 1. Clone and Install Dependencies
 ```bash
-git clone <repository-url>
+git clone git@github.com:mrcandrefarias/file_upload_metadata_extraction.git
 cd file_upload_metadata_extraction
 npm install
 ```
