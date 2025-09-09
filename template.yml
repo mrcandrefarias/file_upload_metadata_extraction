@@ -23,4 +23,14 @@ Resources:
           Properties:
             Path: /upload
             Method: options
+        GetMetadata:
+          Type: HttpApi
+          Properties:
+            Path: /metadata/{file_id}
+            Method: get
+        GetMetadataOptions:
+          Type: HttpApi
+          Properties:
+            Path: /metadata/{file_id}
+            Method: options
 

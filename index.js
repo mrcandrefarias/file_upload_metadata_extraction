@@ -1,4 +1,5 @@
 const { uploadToS3 } = require("./upload.js");
+const { getFileMetadata } = require("./get-metadata.js");
 
 exports.handler = async (event) => {
   
@@ -8,7 +9,7 @@ exports.handler = async (event) => {
         statusCode: 200,
         headers: {
           'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
           'Content-Type': 'application/json'
         },
@@ -16,8 +17,14 @@ exports.handler = async (event) => {
       };
     }
   
-    if (event.requestContext?.http?.method === "POST" || event.rawPath === "/upload") {
+    // Handle upload endpoint
+    if (event.requestContext?.http?.method === "POST" && event.rawPath === "/upload") {
       return await uploadToS3(event);
+    }
+
+    // Handle metadata endpoint
+    if (event.requestContext?.http?.method === "GET" && event.rawPath?.startsWith("/metadata/")) {
+      return await getFileMetadata(event);
     }
 
     return {
@@ -25,7 +32,7 @@ exports.handler = async (event) => {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type'
       },
       body: JSON.stringify({ error: "Not Found" }),

@@ -103,8 +103,6 @@ async function uploadToS3(event) {
     const fileExtension = originalFileName.split('.').pop() || '';
     const mimeType = file_type || mime.lookup(originalFileName) || 'application/octet-stream';
     
-    // Create S3 key with file extension
-    const s3Key = `uploads/${fileId}.${fileExtension}`;
     
     // Convert base64 file data to buffer
     let fileBuffer;
@@ -120,7 +118,7 @@ async function uploadToS3(event) {
     await s3.send(
       new PutObjectCommand({
         Bucket: BUCKET_NAME,
-        Key: s3Key,
+        Key: fileId,
         Body: fileBuffer,
         ContentType: mimeType,
         Metadata: {
