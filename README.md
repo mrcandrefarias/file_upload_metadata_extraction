@@ -176,8 +176,7 @@ The S3MetadataExtractorFunction is configured with a Dead Letter Queue (DLQ) for
 For production deployment:
 
 1. Remove LocalStack endpoint configuration
-2. Use real AWS credentials
+2. Use real AWS Roles
 3. Deploy with `sam deploy --guided`
 4. Add authentication/authorization
-5. Implement proper error logging
 6. Add monitoring and alerting
