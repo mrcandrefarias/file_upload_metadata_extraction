@@ -1,8 +1,6 @@
 #!/bin/bash
-# File: init/01-setup-s3.sh
-# This script runs when LocalStack starts up
 
-echo "🚀 Setting up LocalStack resources..."
+echo "Setting up LocalStack resources..."
 
 # Set AWS CLI to use LocalStack
 export AWS_ACCESS_KEY_ID=test
@@ -21,10 +19,14 @@ aws --endpoint-url=http://localhost:4566 dynamodb create-table \
         AttributeName=author_name,AttributeType=S \
         AttributeName=upload_date,AttributeType=S \
         AttributeName=category,AttributeType=S \
+        AttributeName=file_type,AttributeType=S \
+        AttributeName=extracted_at,AttributeType=S \
     --key-schema AttributeName=file_id,KeyType=HASH \
     --global-secondary-indexes \
         IndexName=AuthorIndex,KeySchema='[{AttributeName=author_name,KeyType=HASH}]',Projection='{ProjectionType=ALL}',ProvisionedThroughput='{ReadCapacityUnits=5,WriteCapacityUnits=5}' \
         IndexName=UploadDateIndex,KeySchema='[{AttributeName=upload_date,KeyType=HASH}]',Projection='{ProjectionType=ALL}',ProvisionedThroughput='{ReadCapacityUnits=5,WriteCapacityUnits=5}' \
         IndexName=CategoryIndex,KeySchema='[{AttributeName=category,KeyType=HASH}]',Projection='{ProjectionType=ALL}',ProvisionedThroughput='{ReadCapacityUnits=5,WriteCapacityUnits=5}' \
+        IndexName=FileTypeIndex,KeySchema='[{AttributeName=file_type,KeyType=HASH}]',Projection='{ProjectionType=ALL}',ProvisionedThroughput='{ReadCapacityUnits=5,WriteCapacityUnits=5}' \
+        IndexName=ExtractedAtIndex,KeySchema='[{AttributeName=extracted_at,KeyType=HASH}]',Projection='{ProjectionType=ALL}',ProvisionedThroughput='{ReadCapacityUnits=5,WriteCapacityUnits=5}' \
     --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
 

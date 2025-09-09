@@ -4,7 +4,7 @@ Resources:
   UploadFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.handler
+      Handler: lambda_api.handler
       Runtime: nodejs18.x
       Environment:
         Variables:
@@ -33,4 +33,50 @@ Resources:
           Properties:
             Path: /metadata/{file_id}
             Method: options
+
+  S3MetadataExtractorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_extraction.handler
+      Runtime: nodejs18.x
+      DeadLetterQueue:
+        Type: SQS
+        TargetArn: !GetAtt MetadataExtractionDLQ.Arn
+      Environment:
+        Variables:
+          BUCKET_NAME: my-file-uploads
+          TABLE_NAME: FileMetadata
+          LOCALSTACK_ENDPOINT: http://host.docker.internal:4566
+          AWS_REGION: us-east-1
+      Events:
+        S3UploadEvent:
+          Type: S3
+          Properties:
+            Bucket: !Ref FileUploadsBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: uploads/
+
+  MetadataExtractionDLQ:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: metadata-extraction-dlq
+      MessageRetentionPeriod: 1209600  # 14 days
+
+  FileUploadsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: my-file-uploads
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt S3MetadataExtractorFunction.Arn
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: uploads/
 

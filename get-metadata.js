@@ -1,21 +1,5 @@
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, GetCommand } = require("@aws-sdk/lib-dynamodb");
-
-// AWS Clients configuration
-const awsConfig = {
-  region: process.env.AWS_REGION || 'us-east-1',
-  endpoint: process.env.LOCALSTACK_ENDPOINT || 'http://host.docker.internal:4566',
-  forcePathStyle: true,
-  credentials: {
-    accessKeyId: 'test',
-    secretAccessKey: 'test'
-  }
-};
-
-const dynamoClient = new DynamoDBClient(awsConfig);
-const docClient = DynamoDBDocumentClient.from(dynamoClient);
-
-const TABLE_NAME = process.env.TABLE_NAME;
+const { GetCommand } = require("@aws-sdk/lib-dynamodb");
+const { docClient, TABLE_NAME } = require("./config/aws-config");
 
 // Helper function to create response
 function createResponse(statusCode, body, headers = {}) {

@@ -1,20 +1,7 @@
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const crypto = require("crypto");
 const mime = require("mime-types");
-
-// AWS Clients configuration
-const awsConfig = {
-  region: process.env.AWS_REGION || 'us-east-1',
-  endpoint: process.env.LOCALSTACK_ENDPOINT || 'http://host.docker.internal:4566',
-  forcePathStyle: true,
-  credentials: {
-    accessKeyId: 'test',
-    secretAccessKey: 'test'
-  }
-};
-
-const s3 = new S3Client(awsConfig);
-const BUCKET_NAME = process.env.BUCKET_NAME;
+const { s3Client, BUCKET_NAME } = require("./config/aws-config");
 
 
 // Helper function to create response
@@ -115,16 +102,17 @@ async function uploadToS3(event) {
     }
     
     // Upload file to S3
-    await s3.send(
+    await s3Client.send(
       new PutObjectCommand({
         Bucket: BUCKET_NAME,
-        Key: fileId,
+        Key: `${fileId}.${fileExtension}`,
         Body: fileBuffer,
         ContentType: mimeType,
         Metadata: {
           original_filename: originalFileName,
           file_id: fileId,
           author_name: metadata?.author_name || '',
+          file_extension: fileExtension,
           upload_date: new Date().toISOString()
         }
       })
