@@ -1,0 +1,23 @@
+{
+  "name": "file-upload-metadata-extraction",
+  "version": "1.0.0",
+  "description": "AWS Lambda function for file upload with metadata extraction",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.0.0",
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0",
+    "mime-types": "^2.1.35"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "s3",
+    "file-upload"
+  ],
+  "author": "",
+  "license": "ISC"
+}

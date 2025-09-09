@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  localstack:
+    container_name: localstack-main
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"            # LocalStack Gateway
+      - "4510-4559:4510-4559"  # External services port range
+    environment:
+      # LocalStack configuration
+      - DEBUG=${DEBUG:-0}
+      - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR:-local}
+      - LAMBDA_REMOTE_DOCKER=0
+      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY:-}  # Pro version (optional)
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      
+      # AWS Services to start (comment out services you don't need)
+      - SERVICES=s3,lambda,dynamodb
+      
+      # S3 Configuration
+      - S3_SKIP_SIGNATURE_VALIDATION=1
+      - S3_SKIP_KMS_KEY_VALIDATION=1
+      
+      # Lambda Configuration
+      - LAMBDA_STAY_OPEN_MODE=1
+      - LAMBDA_IGNORE_ARCHITECTURE=1
+      
+      # Data persistence
+      - PERSISTENCE=${PERSISTENCE:-1}
+      - DATA_DIR=/tmp/localstack/data
+      
+      # Hostname configuration
+      - LOCALSTACK_HOSTNAME=localhost
+      - EDGE_PORT=4566
+      
+      # Enable Pro features (if you have a license)
+      # - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:-}
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./init:/etc/localstack/init/ready.d"  # Initialization scripts
+    networks:
+      - localstack-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  # Optional: LocalStack Web UI (Pro feature)
+  localstack-web:
+    container_name: localstack-web
+    image: localstack/localstack-web
+    ports:
+      - "8080:3000"
+    environment:
+      - LOCALSTACK_URL=http://localstack:4566
+    depends_on:
+      - localstack
+    networks:
+      - localstack-network
+    profiles:
+      - web-ui  # Only start with: docker-compose --profile web-ui up
+
+networks:
+  localstack-network:
+    name: localstack-network
+    driver: bridge

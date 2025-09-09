@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  UploadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Environment:
+        Variables:
+          BUCKET_NAME: my-file-uploads
+          TABLE_NAME: FileMetadata
+          LOCALSTACK_ENDPOINT: http://host.docker.internal:4566
+          AWS_REGION: us-east-1
+      Events:
+        Upload:
+          Type: HttpApi
+          Properties:
+            Path: /upload
+            Method: post
+        UploadOptions:
+          Type: HttpApi
+          Properties:
+            Path: /upload
+            Method: options
+
